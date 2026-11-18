@@ -1,3 +1,7 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 # Project Preferences
 
 ## CRITICAL: Bash Command Rules (applies to ALL agents too)
@@ -85,6 +89,55 @@ check each for `.kt` files, because an empty source-set directory still exists f
 (This paragraph used to say only `:core:data` had a `commonTest` source set and that everything else
 reported `NO-SOURCE`. That was wrong by the time anyone read it, and it caused work to be shipped as
 "compiles for iOS" when it could have been run.)
+
+## Linux Machine
+
+A third checkout runs on Linux. Here the macOS rules apply (`./gradlew`, `which`, no
+`powershell.exe`, normal `sort`/`uniq`, scratchpad for temp files), not the Windows ones.
+Like Windows, Linux cannot run `iosSimulatorArm64Test` - it only cross-compiles iOS klibs.
+
+## Build and Test Commands
+
+App flavors (`:app`): `full` (default, master), `pumpcontrol`, `aapsclient`, `aapsclient2`,
+`aapsclient3` (clients of a master).
+
+- Build an APK: `./gradlew assembleFullDebug --no-daemon` (or `assembleAapsclientDebug`)
+- Full local suite: `runtests.sh` (`testFullDebugUnitTest testDebugUnitTest allTests`)
+- CI suite (use this before pushing): see "Verify Before You Push"
+
+Which test task to use depends on the module type. A wrong task name runs nothing instead of failing:
+
+| Module type | Examples | Test task |
+|---|---|---|
+| Flavoured app | `:app`, `:wear` | `testFullDebugUnitTest` |
+| Plain Android library | most `:pump:*` | `testDebugUnitTest` |
+| KMP module, Android side | `:implementation`, `:plugins:aps`, `:core:utils` | `testAndroidHostTest` |
+| KMP module, JVM side | modules with `jvmTest` | `jvmTest` |
+| Desktop shell | `:desktop:shell` | `test` |
+
+Run one test class:
+`./gradlew :core:utils:testAndroidHostTest --tests "app.aaps.core.utils.JsonHelperTest" --no-daemon -PfirebaseDisable`
+
+## Architecture
+
+AAPS is moving from Android-only to Kotlin Multiplatform with three targets: Android, iOS and
+desktop JVM. Most modules are now KMP (`commonMain` / `androidMain` / `iosMain` / `jvmMain`).
+
+- **Layers:** `core:*` (interfaces, data, keys, utils, ui) → `database:*` → `implementation` →
+  `plugins:*` (APS algorithms, sync, automation, sources, constraints) and `pump:*` (one module per
+  pump driver, some with an `:emulator` submodule) → `app`.
+- **Shells:** `app` (Android), `ios/shell` + `ios/app` (iOS), `desktop/shell` (JVM).
+- **Plugins:** features are plugins extending `PluginBase` (`core/interfaces/.../plugin`).
+- **DI:** Metro (compile-time, `dev.zacsweers.metro`), not Dagger. There is one root graph per
+  platform: `AppRootGraph` (app), `IosAppGraph`, `DesktopAppGraph`, `WearGraph`. Accessor names are
+  locked by `GraphScopeStabilityTest`.
+- **Pump drivers per flavor:** `:app` wires every `:pump:*` module from `settings.gradle` into the
+  `full` and `pumpcontrol` flavors only. `:pump:virtual` goes into all flavors.
+- **Build logic:** convention scripts are in `buildSrc/src/main/kotlin` (`kmp-android-library`,
+  `kmp-test-defaults`, the jacoco ones). `Versions.kt` holds the app version. The JDK version for CI
+  is in `.github/jdk-map.json`.
+- **Design notes:** `_docs/` (for example `RUNNING_MODE_SPEC.md`, `CLIENT_CONTROL.md`,
+  `ios_blockers.md`).
 
 ## Token Usage Reduction (Delay Conversation Compaction)
 
@@ -425,3 +478,5 @@ its own permission (it wipes the app). When asked:
 - Android project (AndroidAPS - open source artificial pancreas system)
 - Main branch: `master`
 - Development branch: `dev`
+- Upstream `CONTRIBUTING.md`: AI-generated PRs to nightscout/AndroidAPS are not welcome. Never open
+  a PR there without the user's explicit request.
