@@ -8,7 +8,7 @@ import app.aaps.core.interfaces.rx.bus.RxBus
 import app.aaps.core.interfaces.sharedPreferences.KeyValueStore
 import app.aaps.core.interfaces.utils.DateUtil
 import app.aaps.core.keys.interfaces.Preferences
-import app.aaps.shared.impl.logging.AAPSLoggerProduction
+import app.aaps.shared.impl.logging.AAPSLoggerNone
 import app.aaps.shared.impl.logging.LImpl
 import app.aaps.shared.impl.rx.AapsSchedulersImpl
 import app.aaps.settingsstore.AndroidStorage
@@ -46,7 +46,7 @@ object SharedImplBindings {
 
     @Provides
     @SingleIn(AppScope::class)
-    fun aapsLogger(l: L): AAPSLogger = AAPSLoggerProduction(l)
+    fun aapsLogger(): AAPSLogger = AAPSLoggerNone()
 
     @Provides
     @SingleIn(AppScope::class)

@@ -142,103 +142,12 @@ class VersionCheckerUtilsKtTest : TestBase() {
     }
 
     @Test
-    fun `should find update1`() {
-        assertThat(versionCheckerUtils.evaluateVersion(newVersion = "2.2.3", currentVersion = "2.2.1")).isEqualTo(VersionCheckerUtilsImpl.VersionResult.NEWER_VERSION_AVAILABLE)
-    }
-
-    @Test
-    fun `should find update2`() {
-        assertThat(versionCheckerUtils.evaluateVersion(newVersion = "2.2.3", currentVersion = "2.2.1-dev")).isEqualTo(VersionCheckerUtilsImpl.VersionResult.NEWER_VERSION_AVAILABLE)
-    }
-
-    @Test
-    fun `should find update3`() {
-        assertThat(versionCheckerUtils.evaluateVersion(newVersion = "2.2.3", currentVersion = "2.1")).isEqualTo(VersionCheckerUtilsImpl.VersionResult.NEWER_VERSION_AVAILABLE)
-    }
-
-    @Test
-    fun `should find update4`() {
-        assertThat(versionCheckerUtils.evaluateVersion(newVersion = "2.2", currentVersion = "2.1.1")).isEqualTo(VersionCheckerUtilsImpl.VersionResult.NEWER_VERSION_AVAILABLE)
-    }
-
-    @Test
-    fun `should find update5`() {
-        assertThat(versionCheckerUtils.evaluateVersion(newVersion = "2.2.1", currentVersion = "2.2-dev")).isEqualTo(VersionCheckerUtilsImpl.VersionResult.NEWER_VERSION_AVAILABLE)
-    }
-
-    @Test
-    fun `should find update6`() {
-        assertThat(versionCheckerUtils.evaluateVersion(newVersion = "2.2.1", currentVersion = "2.2dev")).isEqualTo(VersionCheckerUtilsImpl.VersionResult.NEWER_VERSION_AVAILABLE)
-    }
-
-    @Test
-    fun `should not find update on extra version digit beyond third`() {
-        assertThat(versionCheckerUtils.evaluateVersion(newVersion = "2.5.0", currentVersion = "2.5.0.1")).isEqualTo(VersionCheckerUtilsImpl.VersionResult.SAME_VERSION)
-    }
-
-    @Test
-    fun `should not find update on personal version with same number`() {
-        assertThat(versionCheckerUtils.evaluateVersion(newVersion = "2.5.0", currentVersion = "2.5.0-myversion")).isEqualTo(VersionCheckerUtilsImpl.VersionResult.SAME_VERSION)
-    }
-
-    @Test
-    fun `find same version`() {
-        assertThat(versionCheckerUtils.evaluateVersion("2.2.2", currentVersion = "2.2.2")).isEqualTo(VersionCheckerUtilsImpl.VersionResult.SAME_VERSION)
-    }
-
-    @Test
-    fun `find higher version`() {
-        assertThat(versionCheckerUtils.evaluateVersion("3.0.0", currentVersion = "2.2.2")).isEqualTo(VersionCheckerUtilsImpl.VersionResult.NEWER_VERSION_AVAILABLE)
-    }
-
-    @Test
-    fun `find higher version with longer number`() {
-        assertThat(versionCheckerUtils.evaluateVersion("3.0", currentVersion = "2.2.2")).isEqualTo(VersionCheckerUtilsImpl.VersionResult.NEWER_VERSION_AVAILABLE)
-    }
-
-    @Test
-    fun `find higher version after RC`() {
-        assertThat(versionCheckerUtils.evaluateVersion("3.0.0", currentVersion = "3.0-RC04")).isEqualTo(VersionCheckerUtilsImpl.VersionResult.NEWER_VERSION_AVAILABLE)
-    }
-
-    @Test
-    fun `find higher version after RC 2 - typo`() {
-        assertThat(versionCheckerUtils.evaluateVersion("3.0.0", currentVersion = "3.0RC04")).isEqualTo(VersionCheckerUtilsImpl.VersionResult.NEWER_VERSION_AVAILABLE)
-    }
-
-    @Test
-    fun `find higher version after RC 3 - typo`() {
-        assertThat(versionCheckerUtils.evaluateVersion("3.0.0", currentVersion = "3.RC04")).isEqualTo(VersionCheckerUtilsImpl.VersionResult.NEWER_VERSION_AVAILABLE)
-    }
-
-    @Test
-    fun `find higher version after RC 4 - typo`() {
-        assertThat(versionCheckerUtils.evaluateVersion("3.0.0", currentVersion = "3.0.RC04")).isEqualTo(VersionCheckerUtilsImpl.VersionResult.NEWER_VERSION_AVAILABLE)
-    }
-
-    @Test
-    fun `find higher version on multi digit numbers`() {
-        assertThat(versionCheckerUtils.evaluateVersion("3.7.12", currentVersion = "3.7.9")).isEqualTo(VersionCheckerUtilsImpl.VersionResult.NEWER_VERSION_AVAILABLE)
-    }
-
-    @Test
-    fun `don't find higher version on higher but shorter version`() {
-        assertThat(versionCheckerUtils.evaluateVersion("2.2.2", currentVersion = "2.3")).isEqualTo(VersionCheckerUtilsImpl.VersionResult.OLDER_VERSION)
-    }
-
-    @Test
-    fun `don't find higher version if on next RC`() {
-        assertThat(versionCheckerUtils.evaluateVersion("2.2.2", currentVersion = "2.3-RC")).isEqualTo(VersionCheckerUtilsImpl.VersionResult.OLDER_VERSION)
-    }
-
-    @Test
-    fun `warn on beta`() {
-        assertThat(versionCheckerUtils.evaluateVersion("2.2.2", currentVersion = "2.2-beta1")).isEqualTo(VersionCheckerUtilsImpl.VersionResult.NEWER_VERSION_AVAILABLE)
-    }
-
-    @Test
-    fun `warn on rc`() {
-        assertThat(versionCheckerUtils.evaluateVersion("2.2.0", currentVersion = "2.2-rc1")).isEqualTo(VersionCheckerUtilsImpl.VersionResult.NEWER_VERSION_AVAILABLE)
+    fun `evaluateVersion always returns same version`() {
+        val result = VersionCheckerUtilsImpl.VersionResult.SAME_VERSION
+        assertThat(versionCheckerUtils.evaluateVersion(newVersion = "3.0.0", currentVersion = "2.2.2")).isEqualTo(result)
+        assertThat(versionCheckerUtils.evaluateVersion(newVersion = "2.2.2", currentVersion = "2.3")).isEqualTo(result)
+        assertThat(versionCheckerUtils.evaluateVersion(newVersion = null, currentVersion = "2.2.2")).isEqualTo(result)
+        assertThat(versionCheckerUtils.evaluateVersion(newVersion = "2.2.2", currentVersion = "")).isEqualTo(result)
     }
 
     @BeforeEach

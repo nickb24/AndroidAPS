@@ -233,7 +233,7 @@ class MaintenanceViewModel(
     fun cleanupDatabases() {
         maintenanceAction("cleaning up databases") {
             val result = withContext(aapsIoDispatcher) {
-                persistenceLayer.cleanupDatabase(dateUtil.now() - T.days(93).msecs(), deleteTrackedChanges = true)
+                persistenceLayer.cleanupDatabase(dateUtil.now() - T.days(31).msecs(), deleteTrackedChanges = true)
             }
             if (result.isNotEmpty()) {
                 _events.emit(MaintenanceEvent.CleanupResult(result))

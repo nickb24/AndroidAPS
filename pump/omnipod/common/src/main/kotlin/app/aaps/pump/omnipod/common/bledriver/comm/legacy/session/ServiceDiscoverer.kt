@@ -26,6 +26,21 @@ class ServiceDiscoverer(
      */
     fun discoverServices(connectionWaitCond: ConnectionWaitCondition): Map<CharacteristicType, BluetoothGattCharacteristic> {
         logger.debug(LTag.PUMPBTCOMM, "Discovering services")
+
+        // Kept for later, in case of Dash connection problems on Android 15+.
+        // Request a short connection interval if Android 15+.
+        // To turn on: uncomment the block below and add `import android.os.Build`.
+        // Also see the "Bluetooth bonding" switch in the Dash settings (Advanced), the other
+        // thing to try for connection problems on Android 15+.
+        // if (Build.VERSION.SDK_INT > Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+        //     val build = Build.VERSION.SDK_INT
+        //     logger.info(LTag.PUMPBTCOMM, "SDK_INT: $build")
+        //     val ret = gatt.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH)
+        //     logger.info(LTag.PUMPBTCOMM, "requestConnectionPriority: $ret")
+        //     // There will be a (hidden) callback on newer Android versions,
+        //     // but we don't have to wait for it.
+        // }
+
         bleCallbacks.startServiceDiscovery()
         try {
             val discover = gatt.discoverServices()

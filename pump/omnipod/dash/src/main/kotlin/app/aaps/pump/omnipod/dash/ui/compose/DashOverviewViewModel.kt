@@ -181,14 +181,12 @@ class DashOverviewViewModel(
             )
         )
 
-        if (config.isEngineeringMode()) {
-            add(
-                PumpInfoRow(
-                    label = rh.gs(R.string.omnipod_dash_overview_delivery_status),
-                    value = podStateManager.deliveryStatus?.toString() ?: PLACEHOLDER
-                )
+        add(
+            PumpInfoRow(
+                label = rh.gs(R.string.omnipod_dash_overview_delivery_status),
+                value = podStateManager.deliveryStatus?.toString() ?: PLACEHOLDER
             )
-        }
+        )
 
         // Pod identity
         if (!initialized) {

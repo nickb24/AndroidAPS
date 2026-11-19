@@ -40,8 +40,12 @@ class BleCommCallbacks(
         if (newState == BluetoothProfile.STATE_CONNECTED && status == BluetoothGatt.GATT_SUCCESS) {
             connected.countDown()
         }
-        if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-            // If status == SUCCESS, it means that we initiated the disconnect.
+        // Close the connection once on a disconnect, and also on any error status even if the
+        // state is not DISCONNECTED (for example 133 with state CONNECTED). Then the next connect
+        // opens a new GATT instead of waiting for the connect timeout.
+        // If status == SUCCESS and the state is DISCONNECTED, we initiated the disconnect.
+        // Common error codes: 133 = GATT_ERROR (Android BLE stack error), 19 = disconnected by the pod.
+        if (newState == BluetoothProfile.STATE_DISCONNECTED || status != BluetoothGatt.GATT_SUCCESS) {
             disconnectHandler.onConnectionLost(status)
         }
     }

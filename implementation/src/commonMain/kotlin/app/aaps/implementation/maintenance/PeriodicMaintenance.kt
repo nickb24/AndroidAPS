@@ -90,7 +90,7 @@ class PeriodicMaintenance(
     }
 
     /**
-     * Keep six months of history, trimmed once a day.
+     * Keep [KEEP_DAYS] days of history, trimmed once a day.
      *
      * Also runs when the last run is in the future: the clock went back, and without this the
      * cleanup would stop until real time caught up with it.
@@ -138,7 +138,7 @@ class PeriodicMaintenance(
 
         /** Matches the interval `KeepAliveWorker` is scheduled at on Android. */
         val INTERVAL = 5.minutes
-        const val KEEP_DAYS = 6L * 31
+        const val KEEP_DAYS = 45L
 
         /** One day per daily pass, plus room for a pass that runs late. */
         val MAX_CUTOFF_STEP = 2.days
